@@ -40,8 +40,34 @@ dtrain <- xgb.DMatrix(data = sparse_matrix,label=vazba_vector2)
 dlabel<-xgb.DMatrix(data=vazba_vector2)
 
 
+#parametry v modelu nize sou nastaveny dle trivialniho prikladu z ofic.
+#dokumentace, musi se pomoci CV najit optimalni pocet kol (nrounds) a dale
+# bud rucne s overenim chybovosti nebo pres mlr balik (viz 
+#https://www.hackerearth.com/practice/machine-learning/machine-learning-algorithms/beginners-tutorial-on-xgboost-parameter-tuning-r/tutorial/)
+#...obecne vzato (dle info autoru baliku a heuristickym hledanim na netu)
+#by se melo takto nastavit nrounds (s defaultnimi parametry), pote pripadne zkusit 
+#ty dalsi parametry..na https://stackoverflow.com/questions/35050846/xgboost-in-r-how-does-xgb-cv-pass-the-optimal-parameters-into-xgb-train
+#je jiny navod..s tim si snad nejak poradim (popravde i ty parametry nize z toy modelu fungujou
+#pomerne dobre)
+
+
+
 bst <- xgboost(data = dtrain, label = vazba_vector2, max.depth = 2,
                eta = 1, nthread = 2, nrounds = 5,objective = "binary:logistic")
+
+
+
+#provede crossvalidaci (nfold=5) pro ziskani optimalniho nrounds,
+#ostatni parametry lze nastavit rucne
+
+
+bstcv <- xgb.cv(data = train$data, label = train$label, nfold = 5,
+              nrounds = 20, objective = "binary:logistic",
+              early.stop.round = 3, maximize = FALSE)
+
+
+
+
 
 importance <- xgb.importance( model = bst)   #relat.dulezitost parametru
 head(importance)
