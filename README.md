@@ -1,7 +1,9 @@
 # diplomka
 Repository for a master thesis conducted at VSE;      
 
-ZDE JIZ FUNKCNI XGBOOST (i ml1 - s vazbou jako vysvetlovanou i ml2 - se zlocinem jako vysvetlovanou)   
+ZDE JIZ FUNKCNI XGBOOST (i ml1 - s vazbou jako vysvetlovanou i ml2 - se zlocinem jako vysvetlovanou)..soubory   
+xgboost_ml1_renamed a xgboost_ml2 obs. Rkovej skript
+
 
 
 V texovym dokumentu jsou informace o danych sekcich, jak si to predstavuji, mrkni, zda to souhlasi s tvou predstavou. 
