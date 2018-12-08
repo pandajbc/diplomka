@@ -1,6 +1,8 @@
 # diplomka
 Repository for a master thesis conducted at VSE;      
 
+AKTUALIZOVAL JSEM TEXOVSKEJ SOUBOR...dva dny jsem jen ladil leniency tridy nebot nebyl splnen predpoklad random assignment pripadu, coz jsem testoval balance testy i pro ruzne podmnoziny puv. souboru (opravdu jsem jich zkusil asi dvacet - vynechat krajsky soudy, vynechat 1. a 5. kvantil leniency trid, vynechat extremy apod...zkousel jsem i parametricky testy jako ttesty - bezvysledne, zkousel jsem udelat bunky jako maji v kleinbergovi dle roku a soid - bezvysledne, vzit tyhle novy bunky a z nich jen nejaky leniency tridy - bezvysledne :D), nakonec jsem splneni dosahl tak, ze ze serazeneho souboru dle leniency jsem vybral 3. a 4. tridu (z 5 celkove), to opet seradil do 4 trid dle leniency a z techto 4 nove vzniklych pak vzal 2., 3. a 4. tricu, pricemz to uz vypada dobre, cili ten algoritmus,resp. kontrakci, testuji (v ML model2) na tomto podsouboru. Navic balance (randomization) testy provadeji hodne permutaci dat. souboru, cili Rko po me chtelo asi 60gb RAM, proto jsem musel udelat 3 random samply o velikosti (0.1 * n_i) (kde n_i je velikost i-te tridy, i=1,2,3) z kazde z tehlech 3 trid (overil jsem pres ttest, ze se shoduji s puv.) a az pro tyto random samply jsem udelal balance testy, kt. vyjdou (neboj, neni to zas takovej data torturing, porad mam cca 15000 pozorovani a neni to zadny upravovani ex post dle vysledku). Bez splneni tohoto predpokladu bych nemohl delat contraction! tak proto ta prace, lepsi kdyz to ukazu se splnenim predpokladu na mensim vzorku nez hlasat prelomovy vysledky za nesplneni predpokladu, to by bylo bezcenny...  
+
 ZDE JIZ FUNKCNI XGBOOST (i ml1 - s vazbou jako vysvetlovanou i ml2 - se zlocinem jako vysvetlovanou)..soubory   
 xgboost_ml1_renaming a xgboost_ml2 obsahuji Rkovej skript, pricemz ono renamed znamena, ze jsem tam prejmenoval promenne na   
 anglicke zkratky (napr. aby v tech grafickych vystupech nebylo "dmy_cizinec" ale "foreigner" apod.)...jeste doladim parametry pro model ml2 (hledam to nakonec pres mnoziny rozumnejch hodnot - viz uvedene R soubory) ale heuristicky to vypada docela ok...jinak jsem zkousel i 10fold crossvalidaci, ale vysledky (vzajemne relace (<,>,"o kolik") auc mezi urcitymi volbami parametru) jsou obdobny, takze dle me staci 4fold nebo 5 fold bohate
@@ -9,7 +11,7 @@ anglicke zkratky (napr. aby v tech grafickych vystupech nebylo "dmy_cizinec" ale
 UZIVAM HLAVNE DATASETY: data_train_vse; data_imputation_vse (nadbytecnej, ten binduju pro ucely treninku s data_train_vse, je to   pozustatek toho, kdy jsem chtel delat i imputaci pro reranking, ale na to neni cas); data_test_vse....viz Rkovy skripty, kde z techto jsem schopen vyextrahovat matici pro trenink xgboostu, udelat kraje (z 91 levelu promenne soid muzu udelat 8 				novych dle regionu (cca jihocesky, severomoravsky a tak podobne - "analogicky" ke krajim v CR, jen jich je mene, cili 				jim budu rikat "kraje")) atd.....   
 
 
-Potrebuju od tebe prosim ZDROJ DATA_micro i DATA_summary  
+Potrebuju od tebe prosim ZDROJ DATA_micro i DATA_summary  [nasel jsem tvoji DP, tam mas neco jako zdroj:ESSK, muzes mi prosim poslat presny zdroj dat, resp. co mam dat do zdroju...diky moc]
 
 
 INFO O DANYCH SEKCICH: je v TeXu..., mrkni, zda to souhlasi s tvou predstavou (aktualne v ML model1 nebudu asi delat komparaci s   
