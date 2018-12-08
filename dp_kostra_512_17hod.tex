@@ -37,6 +37,7 @@
 \usepackage{tikz}
 \usepackage{amsfonts}
 \usepackage{amsmath}
+\usepackage{mathtools}
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 
 \usepackage[page,toc]{appendix}
@@ -211,15 +212,15 @@ At this figure reader can find schematical representation of a boosting of decis
 
 \newpage
 \section{Theoretical models}    %vysloveni teor. modelu
-Here I briefly introduce the overview of models later used and evaluated in an empirical part of my thesis. First I present a first model (ML model 1) in which prediction function outputs a predicted probability that certain person will be incarcerate, i.e. a probability of imposing a custody decision upon that person. From that model I can extract most important variables (i.e. variables that are crucial in predicting probability of a custody decision) and interpret coefficents associted with these variables, which is what I am doing at section 2.3. Although it is not included in Kleinberg et al. (2018), it enables me to reveal some factors behind a custody decisions. After that I closely follow a methodology used in Kleinberg et al. (2018) with an intention of answering main question whether there exists some algorithm that may improve a custody decision.
+Here I briefly introduce the overview of models later used and evaluated in an empirical part of my thesis. First I present a first model (ML model 1) in which prediction function outputs a predicted probability that certain person will be incarcerate, i.e. a probability of imposing a custody decision upon that person. From that model I can extract most important variables (i.e. variables that are crucial in predicting probability of a custody decision) and interpret coefficents associted with these variables, which is what I am doing at section 2.3. Although it is not directly included in Kleinberg et al. (2018), it enables me to reveal some factors behind a custody decisions. After that I closely follow a methodology used in Kleinberg et al. (2018) with an intention of answering main question whether there exists some algorithm that may improve a custody decision.
 
 
 
 \subsection{ML model 1}
-First model fits a prediction function that outputs a predicted probability $P(Y=1~\mid~ X)$ of an incarceration, where Y is a binary variable indicating an imprisonment and X are observable characteristics of defendants. Results of the model together with a commentary are in section 2.3.1.
+First model fits a prediction function that outputs a predicted probability $P(Y=1~\mid~ X)$ of an incarceration, where Y is a binary variable indicating an imprisonment and X are observable characteristics of defendants. Results of the model together with a commentary are in section 2.3.
 
 \subsection{ML model 2}
-Main model of my thesis follows Kleinberg et al. (2018) with an adaptation to Czech data. Initially I am posting again a prediction function, now one that outputs a predicted probability of commiting a crime (when crime will be defined later in the empirical section itself). After commenting on the evaluation that function I am dealing with the problem of missing labels using so-called contraction (and quasi-contraction) which enables me to exploit an one-sided nature of the problem. Basically I divide my sample into groups based on leniency of judges (i.e. on their benevolence) and I take cases from the most lenient group of judges (say group 1 of 4) and just imprison further people based on a predicted probability of commiting a crime and watch whether this procedure beats stringer the second group based on a leniency (when beating translates into a possibility of an achievement of the same crime rate with a higher release rate or the same release rate with a lower crime rate). Main advantage of that approach is that I know \textit{(i)} crime labels for people who were incarcerate by a human judge and also \textit{(ii)} crime labels for people who should be incarcerate (their probability of crime is trivially zero just because people cannot commit a crime while being in a prison\footnote{They in fact could commit a \textit{crime}, say that they could stab someone to death in a prison. However this do not accounts for the crime rate as measured by me and it is out of scope of my thesis.}). For that I can answer question of a possibility of improving a custody decision without risking that there is a counterfactual I may do not know. \newline
+Main model of my thesis follows Kleinberg et al. (2018) with an adaptation to Czech data. Initially I am posting again a prediction function, now one that outputs a predicted probability of commiting a crime (when crime will be defined later in the empirical section itself). After commenting on the evaluation that function I am dealing with the problem of missing labels using so-called contraction (and quasi-contraction) which enables me to exploit an one-sided nature of the problem. Basically I divide my sample into groups based on leniency of judges (i.e. on their benevolence) and I take cases from the most lenient group of judges (say group 1 of 4) and just imprison further people based on a predicted probability of commiting a crime and watch whether this procedure beats stringer the second group based on a leniency (when beating translates into a possibility of an achievement of the same crime rate with a higher release rate or the same release rate with a lower crime rate). Main advantage of that approach is that I know \textit{(i)} crime labels for people who were incarcerate by a human judge and also \textit{(ii)} crime labels for people who should be incarcerate (their probability of crime is trivially zero just because people cannot commit a crime while being in a prison)\footnote{They in fact could commit a \textit{crime}, say that they could stab someone to death in a prison. However this do not accounts for the crime rate as measured by me and it is out of scope of my thesis.}. For that I can answer question of a possibility of improving a custody decision without risking that there is a counterfactual I may do not know. \newline
 
 
 
@@ -415,18 +416,71 @@ This table offers descriptive statistics of workout dataset, i.e. of full datase
 
 
 
-\section{ML model 1 — model of a custody decision}   %model pro vyber parametru, kde y=vazba
-In this section I am training an algorithm, where output vector of a training set is a binary vector $\mathbf{y}$, $i-th$ component of a vector indicating whether $i-th$ person was incarcerated (for $i \in 1, 2, \ldots, N$, where N is a total number of observations in a training set, i.e. $N=71~040$). This is together with a matrix $\mathbf{X}$ of observable characteristics used (by a gradient boosted decision tree algorithm) to fit a function that outputs a predicted probability of an incarceration. Algorithm has certain hyperparameters (parameters set before the learning process starts) as a depth of a decision tree, parameters for regularization of a overfitting\footnote{Overfitting happens when an algorithm is heavily dependent on data seen by it, i.e. it is the case when an algorithm corresponds well to just seen data, however at the same time is not capable of reliable prediction from unseen data.} and others, which can be leave as default, however I tried to tune them using a heuristics and informations available in the official documentation of an implementation of an algorithm in R. Maximal number of iterations, corresponding roughly to the number of trees to grow, is then choosed using a 4-fold cross-validation\footnote{Generally, k-fold cross-validations means splitting dataset k-times into training and test sets (test set being usually a 1/k part of original data) and then for each of k iterations training from training data and then validating of the analysis on a test data. In a certain sense it can be understand as a way to prevent a model from an overfitting too.}.\newline
+\section{ML model 1 – model of a custody decision}   %model pro vyber parametru, kde y=vazba
+In this section I am training an algorithm, where output vector of a training set is a binary vector $\mathbf{y}$, $i-th$ component of a vector indicating whether $i-th$ person was incarcerated (for $i \in 1, 2, \ldots, N$, where N is a total number of observations in a training set, i.e. $N=71~040$). This is together with a matrix $\mathbf{X}$ of observable characteristics used (by a gradient boosted decision tree algorithm) to fit a function that outputs a predicted probability of an incarceration. Algorithm has certain hyperparameters (parameters set before the learning process starts) as a depth of a decision tree, parameters for regularization of a overfitting\footnote{Overfitting happens when an algorithm is heavily dependent on data seen by it, i.e. it is the case when an algorithm corresponds well to just seen data, however at the same time is not capable of reliable prediction from unseen data.} and others, which can be leave as default, however I tried to tune them using a heuristics and informations available in the official documentation of an implementation of an algorithm in R. Maximal number of iterations, corresponding roughly to the number of trees to grow, is then choosed using a 4-fold cross-validation\footnote{Generally, k-fold cross-validations means splitting dataset k-times into training and test sets (test set being usually a 1/k part of original data) and then for each of k iterations training from training data and then validating of the analysis on a test data. In a certain sense it can be understand as a way to prevent a model from an overfitting too. I also tried 5-fold and 10-fold cross validations (I could cross-validates number of folds in cross validation as well), however the results are very similar in the sense of magnitudes of AUC.}. After choosing some combination of hyperparameters and doing cross validation for that choose of hyperparameters (which, as I said, just gives me the best number of iterations given some metric, not the actual values of hyperparameters I should choose) I wrote down AUC\footnote{It translates as Area Under (ROC) Curve and expresses, in rough terms, accuracy of a classification. It belongs to the interval from $0.5$ to $1$, where $0.5$ is a worthless classifier and $1$ an excellent one.}. After that I picked up the choose of parameters that gives me the greatest AUC and used these hyperparameters in the ML model 1 itself. AUC in this best case was $0.860157$ which is a pretty good result. Capability of the model to predict the future is then measured by comparing predictions from the model (i.e. predicted values of a probability of a custody decision for observations from test set) with actual custodies decisions for observations from test set. Probabilities from the model were at first transformed into binary variable using a threshold of $0.5$, where defendants with a predicted probability greater than the value of the threshold were classified as a those sent later to a custody. This could again be done by various metrics, I have chosen an average error, AE, which is simply defined as\newline
+\begin{equation}
+AE \coloneqq \frac{\sum_{i=1}^n 1\cdot (\hat{y_i} \neq y_i)}{n}, 
+\end{equation}\newline
+where $\hat{y_i}$ is the $i$th predicted value of a variable $y$, $y_i$ is the $i$th actual value of a variable $y$ and $n$ is a number of observations. The value of AE for ML model 1 is $0.123$ which means that on average $0.123$ of the cases from the test set was misclassified – case was either classified as “custody” when a judge actually did not send this person to a custody or vice versa. Of course, the advantage of using separate training and test sets is that an algorithm has not seen the test set and its prediction is made solely from a learning from the training set.\newline 
+Implementation of an algorithm in RStudio offers function called “xgb.importance” that enables me to extract the most important variables used by an algorithm, i.e. variables that are the most crucial while classifying cases. There is a Table B.1 in appendices where are listed all variables and its importance together with a commentary to the way of recognizing that importance. Most important variables are then in the Figure 2.2, where the relative importance is “the gain”, i. e. the relative contribution of the variable to the model, where, of course, higher value of this metric implies a higher relative importance.\footnote{The gains as a relative metric of an importancy sum up to one.} Based on that figure, the most important variable is “driving/administrative” with a relative importance equal to $0.2267$ followed by “robbery” (gain $ = 0.1310$), “theft/property” (gain $ = 0.1072$), other three variables (“age”, “homicide”, “circum\_drugs”, all with the gain roughly equal to $0.07$) and finally the seventh is “circum\_victim”. All other variables have an importance lower, some of them even significantly lower, as can be seen in Table B.1.
+ I should note that  “driving/administrative”, “robbery”, “theft/property” and “homicide” are four of nine offense categories (an overview of these categories could be find at Table 3.1), “age” is just an age of a defendant in years and  “circum\_drugs” is a variable reflecting the fact that drugs were a circumstance accompanying a certain case. Based on that it is safe to say that type of the offense is the most important condition for classifying the cases. Interestingly the most important variable for an algorithm is a “driving/administrative” which could be probably because there is many of cases handed over to a judge to decide about imposing the custody (as that kind of offense meets the conditions for an imposing the custody)\footnote{Or, better say, it meets the condition for a handing over case to the judge. The decision about imposing a custody is conditional on a consideration of a judge grounding her decision by a facts discussed in the section 2.1. Generally he should ground that decision just on her consideration whether there are met law conditions for an imposing of a custody, i.e. if there is \textit{(i)} a suspicion that accused person could avoid the trial (e.g. by escaping to the another country), \textit{(ii)} a suspicion that she may influencce witnesses or \textit{(iii)} finally (and not exclusively) suspicion that she may continue in her criminal behavior} and at the same time judges may not recognize this kind of offense so severely. I do not have any solid support for that conclusion, as I can not see into judge's head, but it may be the case that a public prosecutor finds that legal conditions for the handing the case over to a judge are met, however a judge can use some non-observables or her intuition (that an offense of an administrative or driving sort is not so severe) and do not send an accusant into a detention.\newline
+Besides of the listing of the most important variables for a classification of cases I offer a figures depicting some decision tree (one of $84$ trees, $84$ being a number of iterations optimalized by a cross validation) used in ML model 1 and also a detailed cutout of that tree in the section with appendices (Figure A.1, resp. A.2). I found it useful to imagine a degree of a complexity of the first model. For example maximum depth of a tree, one of hyperparameters that were set as was discussed in the beginning of that section, is equal to eight and reader can see it directly from Figure A.1 (maximum depth of a tree is defined as a maximum number of nodes that could grow from a root node). The tree was so complex (even in my “toy” model) that a depiction of a full tree in a clear way with visible nodes remarks exceeds the scope of thesis.\newline
+The final remark in this section is that the technique used for a selection of hyperparameters is employed again in the ML model 2, however with the advantage of getting into the problem pretty well. The search for ideal hyperparameters values could be done by a random search (i.e. by picking randomly combinations of hyperparameters and checking how their AUC, measured for the best number of iterations, compares to other combination) or a grid search (i.e. by going through the grid of possible values of hyperparameters). In a certain sense this part (setting the hyperparameters) of thesis has been probably the most difficult until I formed an intuition of how these parameters work.
 
 
-\begin{figure}[ht]
+
+
+\begin{figure}[H]
 \small{
 
-\includegraphics[width=\textwidth]{figure_importance_ml1.pdf}
-\captionof{figure}{Importance table of all independent variables used in ML model 1 [source: own construction]}
-Description of a figure...
+\includegraphics[width=\textwidth]{importance_ml1.pdf}
+\captionof{figure}{Importance figure of all independent variables used in ML model 1 [source: own construction]}
+
+\begin{quotation}
+Here can dear reader find the seven most important variables used in a model with a custody decision as a dependent variable. On X-axis is a gain of the variable, i.e. relative contribution of the variable to the model (relative to the contribution of all variables). Other metrics of a potential use are “cover” which reflects relative number of observations related to this variable and “frequency” which is the percentage of the occurence of some variable in the trees of a model.
+
+\end{quotation}
 }
 \end{figure}
+
+
+
+
+\begin{table} [H]
+\centering
+\begin{tabular}{lrrr}
+  \hline
+   & Offense category & Parts of criminal code 40/2009 Sb., provisions or chapters  \\ 
+  \hline
+ 1 & homicide & provision 140–142 \\ 
+   2 & robbery & 173 \\ 
+   3 & theft/property & 205, 207, 208, 219, 228–248, 251–252, 261–271 \\ 
+   4 & fraud/embezzlement & 206, 209–218, 220–227, 249–250, 253–260 \\ 
+   5 & driving/administrative & 274, 337 \\ 
+   6 & other violent & Chapter I, II \\ 
+   7 & sex offenses & Chapter III \\ 
+   8 & against family & Chapter IV \\ 
+   9 & public safety and order & Chapter VII, VIII, IX, X, XI, XII, XIII \\ 
+
+     \hline
+\end{tabular}
+
+ \caption{Offense categories [source: constructed by Jan Vávra]}
+\medskip
+{\small 
+\begin{quotation}This table summarizes offense categories. In the last column are parts of criminal code that correspond to relevant parts of the Czech law system.
+
+\end{quotation}
+}
+\end{table}
+
+
+
+
+
+
+
+
 
 
 
@@ -434,8 +488,8 @@ Description of a figure...
 \section{Machine learning model 2}     %model hodnotici, zda soudci dobre rozhoduji o vzeti do vazby
 
 Zde tedy "hlavni" model prace, asi pres onen xgboost, kde output bude crime - porovname nejdriv predictedcrime s realnym zlocinem a zaroven i s release rate (abychom vubec vedeli zda jakztakz sedej crime rates a zaroven, zda je splnena intuitivni podminka, ze bude algoritmus lidi s vyssi crime rate vice propoustet). Dale preskupim data do 4 (?asi?) skupin dle leniency (contracting procedure) a tim zkusim otestovat praci soudcu. Zaprve je treba test na randomprirazeni pripadu soudcum (zda treba prisnejsi nemaji jine pridelene pripady nez soudci benevolentnejsi apod.), dale zda se soudci lisi v hodnoceni "unobservables", dale pak zkouset "uveznovat" dalsi lidi a porovnavat s real. soudci, zda je tam prostor pro zlepseni (shodna crime rate a vyssi release, ci shodna release a nizsi crime s uzitim algoritmu (s pomoci algoritmu) implikuje, ze tam prostor pro zlepseni je).\newline
-Pak bych, bude-li cas, zkusil bych napr. test na robustnost (viz online appendix Kleinberg - jine rozdeleni datasetu, treba do roku 2015 tran a 2016+2017 test), dale test na humandatamining (to je replikace algoritmu na holdout set (na zacatku odlozeny a netknuty)).
-
+Pak bych, bude-li cas, zkusil bych napr. test na robustnost (viz online appendix Kleinberg - jine rozdeleni datasetu, treba do roku 2015 tran a 2016+2017 test), dale test na humandatamining (to je replikace algoritmu na holdout set (na zacatku odlozeny a netknuty)).\newline
+This chapter provides an empirical analysis of the main research question
 
 
 
@@ -451,6 +505,9 @@ Text of a conclusion.
 \bibliography{Citace}
 
 \begin{appendices}
+\chapter{Lists}
+
+
 \chapter{Figures}
 
 \begin{figure}[ht]
@@ -461,7 +518,10 @@ Text of a conclusion.
   \abovecaptionskip-\belowcaptionskip\relax]{ml1_dtree_full.png}
 \captionof{figure}{Example of a full decision tree from ML model 1 [source: own construction]}
 
+\begin{quotation}
 Here is a schematical representation of some decision tree used in ML model 1. Its purpose is to show how complex a tree could be even in my case (where neither number of observations nor depth of the tree is large). Light nodes represent decision (split) nodes and darker nodes represent leaf (final) nodes. 
+
+\end{quotation}
 }
 \end{figure}
 
@@ -472,7 +532,11 @@ Here is a schematical representation of some decision tree used in ML model 1. I
   \textheight-4\baselineskip-\parskip-.2em-
   \abovecaptionskip-\belowcaptionskip\relax]{ml1_dtree_part_renamed.png}
 \captionof{figure}{Cutout from a decision tree from ML model 1 [source: own construction]}
+
+\begin{quotation}
 This picture is a cutout from a full decision tree depicted at Figure A.1. It shows how is a decision actually made, going from the root node via decision nodes to some terminal node. For example if victim was not a female (situation depicted by a $< 0.5$ on an edge coming from the root node) than another decision being made is whether is defendant a foreigner, if not then it depends on the age and then (for the age higher or equal than 51.5 and lower than 59.5) on soidJIC (which is a judicial district label). If the judicial district was soidJIC (JIC corresponds as a judicial region roughly to the South Bohemian region) then we end up in the upper leaf.
+
+\end{quotation}
 }
 \end{figure}
 
@@ -511,7 +575,7 @@ This picture is a cutout from a full decision tree depicted at Figure A.1. It sh
      \hline
 \end{tabular}
 
- \caption{Summary statistics of workout dataset}
+ \caption{Importance table for ML model 1}
 \medskip
 {\small \rightline{Continued on the next page}}
 \end{table}
@@ -537,12 +601,12 @@ This picture is a cutout from a full decision tree depicted at Figure A.1. It sh
   31 & highschool & 0.0029 & 0.0018 & 0.0174 \\ 
    \hline
 \end{tabular}
-\renewcommand\thetable{B.1}
+\renewcommand\thetable{C.1}
  \caption{continued from previous page}
 \medskip
 {\small 
 \begin{quotation}
-Description of a table.
+Relative importance of variables given by its gain, cover and frequency are present in this table. Description of metrics is present at Figure 2.2, basically greater value of the metric of a variable $x$ means greater importance of a variable $x$. 
 \end{quotation}
 }
 
@@ -551,11 +615,6 @@ Description of a table.
 
 
 
-
-
-
-\chapter{Some Appendix}
-\chapter{Some Appendix}
 
 
 
